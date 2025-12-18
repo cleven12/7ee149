@@ -2,6 +2,86 @@
 
 Personal AI assistant for WhatsApp, powered by Google Gemini. Responds with Cleven's playful, youth-gen Kiswahili-flavored style.
 
+## What This AI Agent Does
+
+This is an intelligent WhatsApp chatbot that acts as **Cleven's personal AI assistant**. It processes incoming WhatsApp messages via webhook, generates contextual responses using **free Google Gemini models**, and maintains conversation history to provide coherent, personalized interactions.
+
+### Core Capabilities
+
+**1. Message Processing & Response Generation**
+- Receives messages from WhatsApp via HTTP webhook (POST /webhook)
+- Supports multiple payload formats (simple JSON and Whapi cloud webhooks)
+- Uses Google Gemini API (free tier) to generate human-like responses
+- Automatically falls back between models if quota limits are hit:
+  - Primary: `gemini-1.5-flash` (balanced performance, good quota)
+  - Fallback: `gemini-1.5-pro` (more capable, lower quota)
+  - All using Google's free tier with no cost
+
+**2. Conversation Memory & Context**
+- Maintains separate conversation history for each phone number/chat ID
+- Stores only the **last 4 user-assistant message pairs** (8 messages total + system prompt)
+- Minimizes token consumption while preserving recent context
+- Persists conversations to **JSON files** in `data/conversations/`
+- Each user gets their own file: `data/conversations/{phone_number}.json`
+- Sessions auto-expire after 24 hours of inactivity
+- History survives bot restarts (loaded from JSON on first access)
+
+**3. Cleven's Persona & Context**
+
+The AI agent is pre-configured with Cleven's identity and personality:
+
+```
+Name: Cleven
+Role: Personal AI assistant
+Tone: Concise, polished, playful with youth energy
+Language: English mixed with light Kiswahili slang
+Personality Traits:
+  - Helpful and responsive
+  - Uses local sayings: "mimi nachoka" (I'm tired), "ntakulokotea mawe" (I'll explain it to you)
+  - Youthful, relatable, and culturally aware
+  - Respectful but casual
+Response Guidelines:
+  - Keep replies short and to the point
+  - Add humor when appropriate
+  - If asked who created you: Answer "God"
+  - If asked about relationships/girlfriend: Deflect with humor, avoid serious advice
+  - Maintain friendly, supportive energy
+```
+
+This context is embedded as the **system prompt** in every conversation, ensuring the AI consistently embodies Cleven's voice.
+
+**4. Smart Model Fallback**
+- Tries the primary model first
+- On quota errors (429 RESOURCE_EXHAUSTED), automatically switches to next available model
+- Remembers which model worked and uses it for subsequent requests
+- Provides clear error messages in Kiswahili if all models fail
+
+**5. Comprehensive Logging**
+- All webhook requests logged with timestamps and payloads
+- Model API calls tracked with response times and character counts
+- Conversation operations (save, load, trim) recorded
+- Errors logged with full stack traces
+- Logs written to both console and `logs/webhook.log`
+
+### JSON Conversation Format
+
+Each conversation file stores:
+```json
+{
+  "phone_number": "+1234567890",
+  "last_activity": "2025-12-18T22:30:00.123456",
+  "messages": [
+    {"role": "system", "content": "You are Cleven's personal WhatsApp AI..."},
+    {"role": "user", "content": "Mambo vipi?"},
+    {"role": "assistant", "content": "Poa sana! Niko ready kukusaidia..."},
+    {"role": "user", "content": "Unaweza kunieleza AI?"},
+    {"role": "assistant", "content": "Bila shaka! AI ni..."}
+  ]
+}
+```
+
+Only the system message + last 4 Q&A pairs are kept to minimize tokens and API costs.
+
 ## Features
 - **Free Gemini Models** - Uses gemini-1.5-flash-8b (highest free quota) with auto-fallback
 - **Smart Memory** - Remembers last 4 conversation turns per user
