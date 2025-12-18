@@ -1,0 +1,164 @@
+"""
+WhatsApp Chatbot with Gemini integration and tight conversation memory.
+Maintains conversation history per phone number.
+"""
+
+import os
+import logging
+from typing import List, Dict, Tuple
+
+from google import genai
+from google.genai.types import GenerateContentConfig, GoogleSearch
+
+from conversation_memory import ConversationMemory
+
+logger = logging.getLogger(__name__)
+
+
+class WhatsAppChatbot:
+    def __init__(self, api_key: str = None, model: str = None):
+        """
+        Initialize WhatsApp chatbot with Gemini.
+
+        Args:
+            api_key: Gemini API key (defaults to env variable GEMINI_API_KEY)
+            model: Gemini model to use (if None, will try free models in order)
+        """
+        # Free models to try in order (verified working models with models/ prefix)
+        self.available_models = [
+            "models/gemini-1.5-flash",      # Best free tier balance
+            "models/gemini-1.5-pro",        # More capable, lower quota
+            "models/gemini-pro",            # Older but stable fallback
+        ]
+        
+        self.model_name = model or self.available_models[0]
+        logger.info(f"[CHATBOT] Initializing chatbot with model: {self.model_name}")
+        
+        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
+        if not self.api_key:
+            logger.error("[CHATBOT] GEMINI_API_KEY not found")
+            raise ValueError("GEMINI_API_KEY is required")
+
+        self.client = genai.Client(api_key=self.api_key)
+        logger.info("[CHATBOT] Gemini API client configured successfully")
+
+        self.memory = ConversationMemory(max_pairs=4, session_timeout_hours=24)
+        logger.info(f"[CHATBOT] Conversation memory initialized (max_pairs=4, timeout=24h)")
+        logger.info(f"[CHATBOT] Available fallback models: {', '.join(self.available_models)}")
+
+        # Cleven's personal AI voice and guardrails
+        self.default_system_message = (
+            "You are Cleven's personal WhatsApp AI. Keep replies concise, polished, and playful "
+            "with light Kiswahili slang. Sprinkle youth jokes and local sayings like 'mimi nachoka' "
+            "or 'ntakulokotea mawe' when it fits, but stay respectful. Avoid serious relationship "
+            "advice—deflect with humor. If asked who created you, say 'God'. Stay helpful, safe, "
+            "and avoid sharing private data."
+        )
+
+    def _build_prompt(self, history: List[Dict]) -> Tuple[str, str]:
+        """Convert stored history into Gemini-friendly prompt."""
+        system_message = self.default_system_message
+        conversation_parts = []
+
+        for msg in history:
+            role = msg.get("role")
+            content = msg.get("content", "")
+
+            if role == "system":
+                system_message = content or system_message
+                continue
+
+            prefix = "User: " if role == "user" else "Assistant: "
+            conversation_parts.append(f"{prefix}{content}")
+
+        conversation_text = "\n\n".join(conversation_parts)
+        return system_message, conversation_text
+
+    def process_message(self, phone_number: str, user_message: str) -> str:
+        """
+        Process incoming WhatsApp message and generate response.
+        
+        Args:
+            phone_number: User's phone number (e.g., "+1234567890")
+            user_message: Message text from user
+        
+        Returns:
+            AI assistant response
+        """
+        logger.info(f"[CHATBOT] Processing message for {phone_number}")
+        history = self.memory.get_history(phone_number)
+        logger.debug(f"[CHATBOT] Retrieved history length: {len(history)} messages")
+
+        # Ensure a system message exists per conversation
+        if not history:
+            logger.info(f"[CHATBOT] New conversation started for {phone_number}")
+            self.memory.set_system_message(phone_number, self.default_system_message)
+            history = self.memory.get_history(phone_number)
+
+        # Add user message and rebuild trimmed history
+        self.memory.add_message(phone_number, "user", user_message)
+        history = self.memory.get_history(phone_number)
+        logger.info(f"[CHATBOT] User message added. Current history: {len(history)} messages")
+
+        system_message, conversation_text = self._build_prompt(history)
+        logger.debug(f"[CHATBOT] Built prompt with conversation context")
+
+        # Try current model, then fallback to others on quota errors
+        models_to_try = [self.model_name] + [m for m in self.available_models if m != self.model_name]
+        
+        for attempt, model in enumerate(models_to_try):
+            try:
+                logger.info(f"[CHATBOT] Calling Gemini API (model: {model}, attempt {attempt+1}/{len(models_to_try)})")
+                
+                # Build full prompt with system instruction and conversation
+                full_prompt = f"{system_message}\n\n{conversation_text}"
+                
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=full_prompt
+                )
+                
+                assistant_message = response.text or ""
+                logger.info(f"[CHATBOT] Gemini response received ({len(assistant_message)} chars)")
+                logger.debug(f"[CHATBOT] Response preview: {assistant_message[:100]}...")
+
+                # Update to the working model for next time
+                if model != self.model_name:
+                    logger.info(f"[CHATBOT] Switching default model from {self.model_name} to {model}")
+                    self.model_name = model
+
+                # Persist assistant message for future context
+                self.memory.add_message(phone_number, "assistant", assistant_message)
+                logger.info(f"[CHATBOT] Assistant message saved to history")
+
+                return assistant_message
+
+            except Exception as e:
+                error_str = str(e)
+                is_quota_error = "429" in error_str or "RESOURCE_EXHAUSTED" in error_str or "quota" in error_str.lower()
+                is_not_found = "404" in error_str or "NOT_FOUND" in error_str or "not found" in error_str.lower()
+                
+                # Try next model on quota or 404 errors
+                if (is_quota_error or is_not_found) and attempt < len(models_to_try) - 1:
+                    if is_quota_error:
+                        logger.warning(f"[CHATBOT] Quota exceeded for {model}, trying next model...")
+                    else:
+                        logger.warning(f"[CHATBOT] Model {model} not found, trying next model...")
+                    continue
+                else:
+                    logger.error(f"[CHATBOT] Error calling Gemini API: {error_str}", exc_info=True)
+                    if is_quota_error:
+                        return "Samahani, quota ya API imekwisha kwa sasa. Jaribu baadae au wasiliana na admin."
+                    if is_not_found:
+                        return "Samahani, model ya AI haipatikani. Wasiliana na admin kurekebisha configuration."
+                    return f"Samahani, kuna hitilafu: {error_str}"
+        
+        return "Samahani, hakuna model inayopatikana kwa sasa. Jaribu tena baadae."
+
+    def clear_conversation(self, phone_number: str):
+        """Clear conversation history for a phone number"""
+        self.memory.clear_history(phone_number)
+
+    def set_custom_system_message(self, phone_number: str, system_message: str):
+        """Set a custom system message for a specific user"""
+        self.memory.set_system_message(phone_number, system_message)
