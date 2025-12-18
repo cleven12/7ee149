@@ -19,7 +19,7 @@ class WhatsAppChatbot:
         Initialize WhatsApp chatbot with Gemini.
 
         Args:
-            api_key: Gemini API key (defaults to env variable GEMINI_API_KEY)
+            api_key: Single Gemini API key or comma-separated keys (defaults to env GEMINI_API_KEY)
             model: Gemini model to use (if None, will try free models in order)
         """
         # FREE TIER MODELS ONLY - No charges will be incurred
@@ -35,12 +35,18 @@ class WhatsAppChatbot:
         self.model_name = model or self.available_models[0]
         logger.info(f"[CHATBOT] Initializing chatbot with model: {self.model_name}")
         
-        self.api_key = api_key or os.getenv("GEMINI_API_KEY")
-        if not self.api_key:
+        # Support multiple API keys separated by comma
+        api_key_input = api_key or os.getenv("GEMINI_API_KEY")
+        if not api_key_input:
             logger.error("[CHATBOT] GEMINI_API_KEY not found")
             raise ValueError("GEMINI_API_KEY is required")
 
-        self.client = genai.Client(api_key=self.api_key)
+        # Parse multiple keys if provided
+        self.api_keys = [key.strip() for key in api_key_input.split(',') if key.strip()]
+        self.current_key_index = 0
+        logger.info(f"[CHATBOT] Loaded {len(self.api_keys)} API key(s)")
+
+        self.client = genai.Client(api_key=self.api_keys[self.current_key_index])
         logger.info("[CHATBOT] Gemini API client configured successfully")
 
         self.memory = ConversationMemory(max_pairs=4, session_timeout_hours=24)
@@ -90,6 +96,25 @@ Behavioral Constraints:
 - Do not give misleading ICT or legal advice.
 - Prioritize clarity, relevance, and usefulness in every response.
 """
+
+    def _switch_to_next_key(self) -> bool:
+        """
+        Switch to the next available API key.
+        Returns True if switched successfully, False if no more keys available.
+        """
+        if self.current_key_index < len(self.api_keys) - 1:
+            self.current_key_index += 1
+            self.client = genai.Client(api_key=self.api_keys[self.current_key_index])
+            logger.info(f"[CHATBOT] Switched to API key #{self.current_key_index + 1}")
+            return True
+        return False
+
+    def _reset_key_index(self):
+        """Reset to first API key after successful request."""
+        if self.current_key_index != 0:
+            self.current_key_index = 0
+            self.client = genai.Client(api_key=self.api_keys[self.current_key_index])
+            logger.info("[CHATBOT] Reset to primary API key")
 
 
     def _build_prompt(self, history: List[Dict]) -> Tuple[str, str]:

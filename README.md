@@ -12,9 +12,11 @@ This is an intelligent WhatsApp chatbot that acts as **Cleven's personal AI assi
 - Receives messages from WhatsApp via HTTP webhook (POST /webhook)
 - Supports multiple payload formats (simple JSON and Whapi cloud webhooks)
 - Uses Google Gemini API (free tier) to generate human-like responses
-- Automatically falls back between models if quota limits are hit:
-  - Primary: `gemini-1.5-flash` (balanced performance, good quota)
-  - Fallback: `gemini-1.5-pro` (more capable, lower quota)
+- **Seamless multi-key fallback**: Configure multiple API keys, system tries all combinations
+  - For each API key, tries: `gemini-2.0-flash` → `gemini-2.5-flash` → `gemini-1.5-flash` → `gemini-1.5-pro`
+  - When quota expires on one key, automatically switches to next key
+  - Resets to primary key after successful request
+  - Only shows error if ALL keys × ALL models are exhausted
   - All using Google's free tier with no cost
 
 **2. Conversation Memory & Context**
@@ -83,20 +85,25 @@ Each conversation file stores:
 Only the system message + last 4 Q&A pairs are kept to minimize tokens and API costs.
 
 ## Features
-- **Free Gemini Models** - Uses gemini-1.5-flash-8b (highest free quota) with auto-fallback
+- **Multiple API Keys** - Seamless fallback across multiple Gemini API keys when quota expires
+- **Free Gemini Models** - Uses gemini-2.0-flash, gemini-1.5-flash, gemini-1.5-pro (all free tier)
 - **Smart Memory** - Remembers last 4 conversation turns per user
 - **Persistent** - Conversation history saved to JSON files
 - **Whapi Ready** - Works with Whapi.cloud webhooks
 - **Full Logging** - Detailed logs for debugging webhook and model calls
-- **Auto-Fallback** - Switches models automatically on quota errors
+- **Auto-Fallback** - Tries all API keys × all models before giving up
 
 ## Quick Start
 ```bash
 # 1. Install dependencies
 pip install -r requirements.txt
 
-# 2. Set up your Gemini API key
+# 2. Set up your Gemini API key(s) - You can use multiple keys for seamless fallback
+# Single key:
 echo "GEMINI_API_KEY=your_key_here" > .env
+
+# Multiple keys (recommended - comma separated):
+echo "GEMINI_API_KEY=key1,key2,key3" > .env
 
 # 3. Start the bot
 ./restart.sh
