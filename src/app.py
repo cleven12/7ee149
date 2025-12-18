@@ -59,7 +59,7 @@ def send_whapi_reply(chat_id: str, message: str) -> bool:
             "Content-Type": "application/json"
         }
         payload = {
-            "chatId": chat_id,
+            "to": chat_id,
             "body": message
         }
         
