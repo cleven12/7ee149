@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 class ConversationMemory:
-    def __init__(self, max_pairs: int = 4, session_timeout_hours: int = 24, storage_dir: str = "data/conversations"):
+    def __init__(self, max_pairs: int = 4, session_timeout_hours: int = 24, storage_dir: str = None):
         """
         Initialize conversation memory storage with JSON persistence.
 
@@ -23,6 +23,8 @@ class ConversationMemory:
             session_timeout_hours: Hours after which to clear old conversations
             storage_dir: Directory to store conversation JSON files
         """
+        if storage_dir is None:
+            storage_dir = Path(__file__).parent.parent / "data" / "conversations"
         self.storage_dir = Path(storage_dir)
         self.storage_dir.mkdir(parents=True, exist_ok=True)
         logger.info(f"[MEMORY] Storage directory: {self.storage_dir}")

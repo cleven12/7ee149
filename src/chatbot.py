@@ -8,8 +8,6 @@ import logging
 from typing import List, Dict, Tuple
 
 from google import genai
-from google.genai.types import GenerateContentConfig, GoogleSearch
-
 from conversation_memory import ConversationMemory
 
 logger = logging.getLogger(__name__)
@@ -24,11 +22,12 @@ class WhatsAppChatbot:
             api_key: Gemini API key (defaults to env variable GEMINI_API_KEY)
             model: Gemini model to use (if None, will try free models in order)
         """
-        # Free models to try in order (verified working models with models/ prefix)
+        # FREE TIER MODELS ONLY - No charges will be incurred
+        # Google's free tier provides generous quotas for these models
+        # Using correct format for google-genai SDK (no 'models/' prefix)
         self.available_models = [
-            "models/gemini-1.5-flash",      # Best free tier balance
-            "models/gemini-1.5-pro",        # More capable, lower quota
-            "models/gemini-pro",            # Older but stable fallback
+            "gemini-2.0-flash",             # PRIMARY: Latest, fastest, highest free quota
+            "gemini-2.5-flash",             # FALLBACK: Latest flash model
         ]
         
         self.model_name = model or self.available_models[0]
