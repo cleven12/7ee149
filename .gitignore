@@ -1,3 +1,27 @@
+# Environment
 .env
-venv
+.venv
+venv/
+env/
 
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+
+# Logs
+logs/
+*.log
+
+# Conversation data (exclude user data but keep structure)
+data/conversations/*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
