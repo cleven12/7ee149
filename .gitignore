@@ -21,7 +21,8 @@ data/conversations/*.json
 .idea/
 *.swp
 *.swo
-
+PRESENTATION_GUIDE.md
+SIMPLE_SLIDES_OUTLINE.md
 # OS
 .DS_Store
 Thumbs.db

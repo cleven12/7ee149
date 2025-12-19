@@ -1,3 +1,5 @@
+<div align="center">
+
 # Personal AI WhatsApp Bot
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
@@ -7,7 +9,10 @@
 [![Status](https://img.shields.io/badge/Status-Active-success.svg)]()
 [![Free Tier](https://img.shields.io/badge/Cost-Free%20Tier-brightgreen.svg)]()
 
-Personal AI assistant for WhatsApp, powered by Google Gemini. Responds with Personal AI's playful, youth-gen Kiswahili-flavored style.
+### Personal AI assistant for WhatsApp, powered by Google Gemini
+*Responds with Personal AI's playful, youth-gen Kiswahili-flavored style*
+
+</div>
 
 ## What This AI Agent Does
 

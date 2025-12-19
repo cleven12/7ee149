@@ -2,7 +2,7 @@
 
 ## Overview
 - Powered by **Gemini 1.5 Flash** (stable, generous free tier)
-- Cleven's playful, concise youth tone with Kiswahili flavor
+- CGM's playful, concise youth tone with Kiswahili flavor
 - Conversation memory per phone number; only the last 4 user/assistant turns are kept (system prompt is preserved) to save tokens
 - Webhook accepts both simple JSON and common Whapi payload shapes
 
@@ -24,7 +24,7 @@
    ```
 
 ## Behavior
-- Persona: Cleven's personal AI; polished, concise, a bit playful. Can drop light Kiswahili slang and sayings like "mimi nachoka" or "ntakulokotea mawe" when it fits. If asked who created you, answer "God". Dodge relationship/girlfriend topics with humor.
+- Persona: 's personal AI; polished, concise, a bit playful. Can drop light Kiswahili slang and sayings like "mimi nachoka" or "ntakulokotea mawe" when it fits. If asked who created you, answer "God". Dodge relationship/girlfriend topics with humor.
 - Memory: only message bodies are stored; trims to the last 4 question/answer pairs per phone number. Sessions expire after 24 hours of inactivity.
 - User ID: the phone number/chat ID is the session key.
 
@@ -96,7 +96,7 @@ curl -X POST http://localhost:80/clear/+1234567890
 # 1) Teach the bot something
 curl -X POST http://localhost:80/webhook \
   -H "Content-Type: application/json" \
-  -d '{"phone_number": "+1234567890", "message": "Jina langu ni Cleven"}'
+  -d '{"phone_number": "+1234567890", "message": "Jina langu ni CGM "}'
 
 # 2) Ask about it; the bot remembers within the last 4 turns
 curl -X POST http://localhost:80/webhook \
