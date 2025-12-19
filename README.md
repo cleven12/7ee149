@@ -1,10 +1,17 @@
-# Cleven's WhatsApp AI Bot
+# Personal AI WhatsApp Bot
 
-Personal AI assistant for WhatsApp, powered by Google Gemini. Responds with Cleven's playful, youth-gen Kiswahili-flavored style.
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![Flask](https://img.shields.io/badge/Flask-3.1+-green.svg)](https://flask.palletsprojects.com/)
+[![Google Gemini](https://img.shields.io/badge/Google-Gemini%20AI-orange.svg)](https://ai.google.dev/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Status](https://img.shields.io/badge/Status-Active-success.svg)]()
+[![Free Tier](https://img.shields.io/badge/Cost-Free%20Tier-brightgreen.svg)]()
+
+Personal AI assistant for WhatsApp, powered by Google Gemini. Responds with Personal AI's playful, youth-gen Kiswahili-flavored style.
 
 ## What This AI Agent Does
 
-This is an intelligent WhatsApp chatbot that acts as **Cleven's personal AI assistant**. It processes incoming WhatsApp messages via webhook, generates contextual responses using **free Google Gemini models**, and maintains conversation history to provide coherent, personalized interactions.
+This is an intelligent WhatsApp chatbot that acts as **CGM personal AI assistant**. It processes incoming WhatsApp messages via webhook, generates contextual responses using **free Google Gemini models**, and maintains conversation history to provide coherent, personalized interactions.
 
 ### Core Capabilities
 
@@ -28,12 +35,12 @@ This is an intelligent WhatsApp chatbot that acts as **Cleven's personal AI assi
 - Sessions auto-expire after 24 hours of inactivity
 - History survives bot restarts (loaded from JSON on first access)
 
-**3. Cleven's Persona & Context**
+**3. CGM Persona & Context**
 
-The AI agent is pre-configured with Cleven's identity and personality:
+The AI agent is pre-configured with CGM identity and personality:
 
 ```
-Name: Cleven
+Name: CGM
 Role: Personal AI assistant
 Tone: Concise, polished, playful with youth energy
 Language: English mixed with light Kiswahili slang
@@ -50,7 +57,7 @@ Response Guidelines:
   - Maintain friendly, supportive energy
 ```
 
-This context is embedded as the **system prompt** in every conversation, ensuring the AI consistently embodies Cleven's voice.
+This context is embedded as the **system prompt** in every conversation, ensuring the AI consistently embodies CGM voice.
 
 **4. Smart Model Fallback**
 - Tries the primary model first
@@ -73,7 +80,7 @@ Each conversation file stores:
   "phone_number": "+1234567890",
   "last_activity": "2025-12-18T22:30:00.123456",
   "messages": [
-    {"role": "system", "content": "You are Cleven's personal WhatsApp AI..."},
+    {"role": "system", "content": "You are CGM personal WhatsApp AI..."},
     {"role": "user", "content": "Mambo vipi?"},
     {"role": "assistant", "content": "Poa sana! Niko ready kukusaidia..."},
     {"role": "user", "content": "Unaweza kunieleza AI?"},
@@ -84,33 +91,88 @@ Each conversation file stores:
 
 Only the system message + last 4 Q&A pairs are kept to minimize tokens and API costs.
 
-## Features
-- **Multiple API Keys** - Seamless fallback across multiple Gemini API keys when quota expires
-- **Free Gemini Models** - Uses gemini-2.0-flash, gemini-1.5-flash, gemini-1.5-pro (all free tier)
-- **Smart Memory** - Remembers last 4 conversation turns per user
-- **Persistent** - Conversation history saved to JSON files
-- **Whapi Ready** - Works with Whapi.cloud webhooks
-- **Full Logging** - Detailed logs for debugging webhook and model calls
-- **Auto-Fallback** - Tries all API keys × all models before giving up
+## ✨ Features
 
-## Quick Start
-```bash
-# 1. Install dependencies
-pip install -r requirements.txt
+- 🔑 **Multiple API Keys** - Seamless fallback across multiple Gemini API keys when quota expires
+- 💰 **Free Gemini Models** - Uses gemini-2.0-flash, gemini-1.5-flash, gemini-1.5-pro (all free tier)
+- 🧠 **Smart Memory** - Remembers last 4 conversation turns per user (optimized for token efficiency)
+- 💾 **Persistent Storage** - Conversation history saved to JSON files, survives restarts
+- 📱 **Whapi Ready** - Works with Whapi.cloud webhooks for automatic WhatsApp replies
+- 📊 **Full Logging** - Detailed logs for debugging webhook and model calls
+- 🔄 **Auto-Fallback** - Tries all API keys × all models before giving up (12+ attempts with 3 keys)
+- 🌍 **Kiswahili Persona** - Custom personality with local slang and cultural awareness
+- ⚡ **Zero Downtime** - Automatic key rotation ensures continuous operation
 
-# 2. Set up your Gemini API key(s) - You can use multiple keys for seamless fallback
-# Single key:
-echo "GEMINI_API_KEY=your_key_here" > .env
+## 🚀 Quick Start
 
-# Multiple keys (recommended - comma separated):
-echo "GEMINI_API_KEY=key1,key2,key3" > .env
+### Prerequisites
+- Python 3.11 or higher
+- Git
+- Google Gemini API key (free from [Google AI Studio](https://aistudio.google.com/))
+- WhatsApp Business API (optional - via [Whapi.cloud](https://whapi.cloud/))
 
-# 3. Start the bot
-./restart.sh
+### Installation
 
-# 4. Test it
-./test_bot.sh
-```
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/cleven12/7ee149.git
+   cd 7ee149
+   ```
+
+2. **Install dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configure environment variables**
+   
+   Create a `.env` file:
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit `.env` and add your API key(s):
+   ```bash
+   # Single key (basic)
+   GEMINI_API_KEY=your_key_here
+   
+   # Multiple keys (recommended for zero downtime)
+   GEMINI_API_KEY=key1,key2,key3
+   
+   # Optional: For automatic WhatsApp replies
+   WHAPI_TOKEN=your_whapi_token
+   WHAPI_BASE_URL=https://gate.whapi.cloud
+   ```
+
+4. **Start the bot**
+   ```bash
+   # Using the restart script (recommended)
+   ./restart.sh
+   
+   # Or manually
+   python src/main.py
+   ```
+
+5. **Test locally**
+   ```bash
+   # Send a test message
+   ./test_bot.sh "Mambo vipi?"
+   
+   # Or use curl
+   curl -X POST http://localhost:80/webhook \
+     -H "Content-Type: application/json" \
+     -d '{"phone_number": "+1234567890", "message": "Hello!"}'
+   ```
+
+### Getting Gemini API Keys
+
+1. Go to [Google AI Studio](https://aistudio.google.com/)
+2. Sign in with your Google account
+3. Click "Get API Key" → "Create API key"
+4. Copy the key and add to `.env`
+5. (Optional) Repeat with different Google accounts for multiple keys
+
+**💡 Pro Tip**: Use 2-3 API keys for seamless operation. Each free key gets 1500 requests/day!
 
 ## Project Structure
 ```
@@ -139,37 +201,95 @@ GEMINI_API_KEY=your_gemini_api_key_here
 # WHAPI_BASE_URL=https://gate.whapi.cloud
 ```
 
-## API Endpoints
+## 📡 API Endpoints
 
 ### `POST /webhook`
 Receive WhatsApp messages and get AI replies.
 
 **Simple format:**
 ```json
-{"phone_number": "+1234567890", "message": "Mambo vipi?"}
+{
+  "phone_number": "+1234567890",
+  "message": "Mambo vipi?"
+}
 ```
 
 **Whapi format:**
 ```json
-{"from": "+1234567890", "text": "Mambo vipi?"}
+{
+  "from": "+1234567890",
+  "text": "Mambo vipi?"
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "response": "Poa sana! Niko ready kukusaidia. Unauliza nini?"
+}
 ```
 
 ### `POST /clear/<phone_number>`
 Clear conversation history for a user.
 
-## Persona
-- Cleven's personal AI
-- Concise, polished, playful tone
-- Light Kiswahili slang ("mimi nachoka", "ntakulokotea mawe")
-- Deflects relationship advice with humor
-- Says "God" when asked who created it
+**Example:**
+```bash
+curl -X POST http://localhost:80/clear/+1234567890
+```
 
-## Documentation
-See [docs/USAGE.md](docs/USAGE.md) for:
-- Whapi integration steps
-- Testing locally
-- Log monitoring
-- Memory behavior details
+## 🎭 Persona
 
-## License
-See [LICENSE](LICENSE)
+The AI embodies CGM's personal style:
+- ✅ Concise, polished, playful tone
+- 🗣️ Light Kiswahili slang ("mimi nachoka", "ntakulokotea mawe", "ipo sawa")
+- 😄 Deflects relationship advice with humor
+- 🙏 Says "God" when asked who created it
+- 🎯 Professional on ICT topics, casual on social topics
+
+## 📚 Documentation
+
+- **[USAGE.md](docs/USAGE.md)** - Detailed usage guide, Whapi integration, testing
+- **[MULTI_KEY_SETUP.md](docs/MULTI_KEY_SETUP.md)** - Complete guide to multiple API keys
+
+## 🛠️ Monitoring & Logs
+
+Watch live logs:
+```bash
+# All webhook activity
+tail -f logs/webhook.log
+
+# Filter for errors only
+tail -f logs/webhook.log | grep ERROR
+
+# Monitor key switching
+tail -f logs/webhook.log | grep "Switched to API key"
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Feel free to:
+- Report bugs
+- Suggest features
+- Submit pull requests
+- Improve documentation
+
+## 📄 License
+
+This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
+
+## 🙏 Acknowledgments
+
+- [Google Gemini AI](https://ai.google.dev/) - Free AI models
+- [Whapi.cloud](https://whapi.cloud/) - WhatsApp Business API
+- [Flask](https://flask.palletsprojects.com/) - Web framework
+
+---
+
+<div align="center">
+  
+**Made with ❤️ for seamless WhatsApp AI conversations**
+
+[Report Bug](https://github.com/cleven12/7ee149/issues) · [Request Feature](https://github.com/cleven12/7ee149/issues)
+
+</div>
