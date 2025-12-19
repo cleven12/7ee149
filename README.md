@@ -96,19 +96,19 @@ Each conversation file stores:
 
 Only the system message + last 4 Q&A pairs are kept to minimize tokens and API costs.
 
-## ✨ Features
+##  Features
 
-- 🔑 **Multiple API Keys** - Seamless fallback across multiple Gemini API keys when quota expires
-- 💰 **Free Gemini Models** - Uses gemini-2.0-flash, gemini-1.5-flash, gemini-1.5-pro (all free tier)
-- 🧠 **Smart Memory** - Remembers last 4 conversation turns per user (optimized for token efficiency)
-- 💾 **Persistent Storage** - Conversation history saved to JSON files, survives restarts
-- 📱 **Whapi Ready** - Works with Whapi.cloud webhooks for automatic WhatsApp replies
-- 📊 **Full Logging** - Detailed logs for debugging webhook and model calls
-- 🔄 **Auto-Fallback** - Tries all API keys × all models before giving up (12+ attempts with 3 keys)
-- 🌍 **Kiswahili Persona** - Custom personality with local slang and cultural awareness
-- ⚡ **Zero Downtime** - Automatic key rotation ensures continuous operation
+- **Multiple API Keys** - Seamless fallback across multiple Gemini API keys when quota expires
+- **Free Gemini Models** - Uses gemini-2.0-flash, gemini-1.5-flash, gemini-1.5-pro (all free tier)
+- **Smart Memory** - Remembers last 4 conversation turns per user (optimized for token efficiency)
+- **Persistent Storage** - Conversation history saved to JSON files, survives restarts
+- **Whapi Ready** - Works with Whapi.cloud webhooks for automatic WhatsApp replies
+- **Full Logging** - Detailed logs for debugging webhook and model calls
+- **Auto-Fallback** - Tries all API keys × all models before giving up (12+ attempts with 3 keys)
+- **Kiswahili Persona** - Custom personality with local slang and cultural awareness
+- **Zero Downtime** - Automatic key rotation ensures continuous operation
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Python 3.11 or higher
@@ -177,7 +177,7 @@ Only the system message + last 4 Q&A pairs are kept to minimize tokens and API c
 4. Copy the key and add to `.env`
 5. (Optional) Repeat with different Google accounts for multiple keys
 
-**💡 Pro Tip**: Use 2-3 API keys for seamless operation. Each free key gets 1500 requests/day!
+** Pro Tip**: Use 2-3 API keys for seamless operation. Each free key gets 1500 requests/day!
 
 ## Project Structure
 ```
@@ -206,7 +206,7 @@ GEMINI_API_KEY=your_gemini_api_key_here
 # WHAPI_BASE_URL=https://gate.whapi.cloud
 ```
 
-## 📡 API Endpoints
+## API Endpoints
 
 ### `POST /webhook`
 Receive WhatsApp messages and get AI replies.
@@ -243,21 +243,21 @@ Clear conversation history for a user.
 curl -X POST http://localhost:80/clear/+1234567890
 ```
 
-## 🎭 Persona
+## Persona
 
 The AI embodies CGM's personal style:
-- ✅ Concise, polished, playful tone
-- 🗣️ Light Kiswahili slang ("mimi nachoka", "ntakulokotea mawe", "ipo sawa")
-- 😄 Deflects relationship advice with humor
-- 🙏 Says "God" when asked who created it
-- 🎯 Professional on ICT topics, casual on social topics
+-  Concise, polished, playful tone
+-  Light Kiswahili slang ("mimi nachoka", "ntakulokotea mawe", "ipo sawa")
+-  Deflects relationship advice with humor
+-  Says "God" when asked who created it
+-  Professional on ICT topics, casual on social topics
 
-## 📚 Documentation
+## Documentation
 
 - **[USAGE.md](docs/USAGE.md)** - Detailed usage guide, Whapi integration, testing
 - **[MULTI_KEY_SETUP.md](docs/MULTI_KEY_SETUP.md)** - Complete guide to multiple API keys
 
-## 🛠️ Monitoring & Logs
+## Monitoring & Logs
 
 Watch live logs:
 ```bash
@@ -271,7 +271,7 @@ tail -f logs/webhook.log | grep ERROR
 tail -f logs/webhook.log | grep "Switched to API key"
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Feel free to:
 - Report bugs
@@ -279,11 +279,11 @@ Contributions are welcome! Feel free to:
 - Submit pull requests
 - Improve documentation
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [Google Gemini AI](https://ai.google.dev/) - Free AI models
 - [Whapi.cloud](https://whapi.cloud/) - WhatsApp Business API
