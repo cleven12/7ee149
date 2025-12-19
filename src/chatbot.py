@@ -206,12 +206,12 @@ Focus:
                 else:
                     logger.error(f"[CHATBOT] Error calling Gemini API: {error_str}", exc_info=True)
                     if is_quota_error:
-                        return "Samahani, quota ya API imekwisha kwa sasa. Jaribu baadae au wasiliana na admin."
+                        return "Samahani, Kunachangamoto ya kimfumo kwa sasa, wasiliana nasi kwa njia mbadala kama zilivyo orodheshwa na viongozi."
                     if is_not_found:
-                        return "Samahani, model ya AI haipatikani. Wasiliana na admin kurekebisha configuration."
+                        return "Samahani, Kunachangamoto ya kimfumo kwa sasa, wasiliana nasi kwa njia mbadala kama zilivyo orodheshwa na viongozi"                    
                     return f"Samahani, kuna hitilafu: {error_str}"
         
-        return "Samahani, hakuna model inayopatikana kwa sasa. Jaribu tena baadae."
+        return "Samahani, Kunachangamoto ya kimfumo kwa sasa, wasiliana nasi kwa njia mbadala kama zilivyo orodheshwa na viongozi. Jaribu tena baadae."
 
     def clear_conversation(self, phone_number: str):
         """Clear conversation history for a phone number"""
