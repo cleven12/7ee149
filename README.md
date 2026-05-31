@@ -137,6 +137,11 @@ tail -f logs/webhook.log | grep "Switched to API key"  # Key rotation
 
 ---
 
+## Support
+
+If you find this project useful, please consider supporting my work:
+[Support Me](https://snippe.me/pay/support-cleven)
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
